@@ -3,7 +3,7 @@
 #include "edge_detection_auxiliary.h"
 
 struct Masks {
-	struct Mask masks[4];
+	struct Mask masks[10];
 };
 
 struct Masks create_masks() {
@@ -21,8 +21,9 @@ struct Masks create_masks() {
         mask_gaussian[3][0] = 4; mask_gaussian[3][1] = 9; mask_gaussian[3][2] = 12; mask_gaussian[3][3] = 9; mask_gaussian[3][4] = 4;
         mask_gaussian[4][0] = 2; mask_gaussian[4][1] = 4; mask_gaussian[4][2] = 5; mask_gaussian[4][3] = 4; mask_gaussian[4][4] = 2;
 
-        write_to.masks[1].mask = mask_gaussian;
-        write_to.masks[1].mask_size = 5;
+        write_to.masks[0].mask = mask_gaussian;
+        write_to.masks[0].mask_size = 5;
+        write_to.masks[0].mask_radius = 2;
     }
 
     int** mask1 = malloc(3 * sizeof(*mask1));
@@ -37,6 +38,7 @@ struct Masks create_masks() {
 
         write_to.masks[1].mask = mask1;
         write_to.masks[1].mask_size = 3;
+        write_to.masks[1].mask_radius = 1;
     }
 
 
@@ -51,6 +53,7 @@ struct Masks create_masks() {
 
         write_to.masks[2].mask = mask2;
         write_to.masks[2].mask_size = 3;
+        write_to.masks[2].mask_radius = 1;
     }
 
 
@@ -65,6 +68,35 @@ struct Masks create_masks() {
 
         write_to.masks[3].mask = mask3;
         write_to.masks[3].mask_size = 3;
+        write_to.masks[3].mask_radius = 1;
+    }
+
+    int** mask4 = malloc(3 * sizeof(*mask4));
+    if (mask4) {
+        for (size_t i = 0; i < 3; i++) {
+            mask4[i] = malloc(3 * sizeof(mask4[0]));
+        }
+        mask4[0][0] = 1; mask4[0][1] = 1; mask4[0][2] = 1;
+        mask4[1][0] = 1;  mask4[1][1] = -8; mask4[1][2] = 1;
+        mask4[2][0] = 1; mask4[2][1] = 1; mask4[2][2] = 1;
+
+        write_to.masks[4].mask = mask4;
+        write_to.masks[4].mask_size = 3;
+        write_to.masks[4].mask_radius = 1;
+    }
+
+    int** mask5 = malloc(3 * sizeof(*mask5));
+    if (mask5) {
+        for (size_t i = 0; i < 3; i++) {
+            mask5[i] = malloc(3 * sizeof(mask5[0]));
+        }
+        mask5[0][0] = 47; mask5[0][1] = 0; mask5[0][2] = -47;
+        mask5[1][0] = 162;  mask5[1][1] = 0; mask5[1][2] = -162;
+        mask5[2][0] = 47; mask5[2][1] = 0; mask5[2][2] = -47;
+
+        write_to.masks[5].mask = mask5;
+        write_to.masks[5].mask_size = 3;
+        write_to.masks[5].mask_radius = 1;
     }
 
     return write_to;

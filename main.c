@@ -256,7 +256,7 @@ int main() {
     
 
     int width, height;
-    uint8_t* image = stbi_load("sample_lizard.jpg", &width, &height, &channels, 3);
+    uint8_t* image = stbi_load("./images/sample_lizard_medium.jpg", &width, &height, &channels, 3);
 
     uint8_t* gray = get_channel(convert_to_grayscale(image, width, height), width, height, 0);
 
@@ -267,74 +267,16 @@ int main() {
     /* end prologue*/
     /* perform calculations on   image_mat */
 
+    gaussian_blur(&image_mat);
 
-    int** mask1 = malloc(3 * sizeof(*mask1));
-    if (mask1) {
-        for (size_t i = 0; i < 3; i++) {
-            mask1[i] = malloc(3 * sizeof(mask1[0]));
-        }
+    struct Masks mo = create_masks();
+    struct Mask mask = mo.masks[4];
 
-        mask1[0][0] = -1; mask1[0][1] = -2; mask1[0][2] = -1;
-        mask1[1][0] = 0;  mask1[1][1] = 0; mask1[1][2] = 0;
-        mask1[2][0] = 1; mask1[2][1] = 2; mask1[2][2] = 1;
-
-    }
-    struct Mask m;
-    m.mask = mask1;
-    m.mask_radius = 1;
-    m.mask_size = 3;
-
-    uint8_t** mask_gaussian = malloc(5 * sizeof(*mask_gaussian));
-    if (mask_gaussian) {
-        for (size_t i = 0; i < 5; i++) {
-            mask_gaussian[i] = malloc(5 * sizeof(mask_gaussian[0]));
-        }
-
-        mask_gaussian[0][0] = 2; mask_gaussian[0][1] = 4; mask_gaussian[0][2] = 5; mask_gaussian[0][3] = 4; mask_gaussian[0][4] = 2;
-        mask_gaussian[1][0] = 4; mask_gaussian[1][1] = 9; mask_gaussian[1][2] = 12; mask_gaussian[1][3] = 9; mask_gaussian[1][4] = 4;
-        mask_gaussian[2][0] = 5; mask_gaussian[2][1] = 12; mask_gaussian[2][2] = 15; mask_gaussian[2][3] = 12; mask_gaussian[2][4] = 5;
-        mask_gaussian[3][0] = 4; mask_gaussian[3][1] = 9; mask_gaussian[3][2] = 12; mask_gaussian[3][3] = 9; mask_gaussian[3][4] = 4;
-        mask_gaussian[4][0] = 2; mask_gaussian[4][1] = 4; mask_gaussian[4][2] = 5; mask_gaussian[4][3] = 4; mask_gaussian[4][4] = 2;
-        
-    }
-
-    for (size_t i = 0; i < 5; i++) {
-        for (size_t j = 0; j < 5; j++) {
-
-            printf("%d ", mask_gaussian[i][j]);
-
-        }
-        printf("\n");
-    }
-
-    for (size_t i = 1; i < 4; i++) {
-        for (size_t j = 1; j < 4; j++) {
-
-            uint8_t pixel_value = calculate_mask(mask_gaussian, j, i, m);
-
-            mask_gaussian[i][j] = pixel_value;
-
-        }
-    }
-
-
-    printf("\n\n");
-
-    for (size_t i = 0; i < 5; i++) {
-        for (size_t j = 0; j < 5; j++) {
-
-            printf("%d ", mask_gaussian[i][j]);
-
-        }
-        printf("\n");
-    }
-
-
-
+    calculate_gradient_strength(&image_mat, mask);
 
     /* start epilogue */
     uint8_t* output = matrix_to_image(&image_mat);
-    stbi_write_jpg("output_test.jpg", width, height, 1, output, width * channels);
+    stbi_write_jpg("output_test_medium.jpg", width, height, 1, output, width * channels);
 
     stbi_image_free(image);
 	return 0;

@@ -175,3 +175,17 @@ uint8_t* matrix_to_image(struct ImageMatrix* mat) {
     return 0; //error
 }
 
+
+
+// not working yet
+void copy_image_outward(struct ImageMatrix* mat) {
+    size_t temp_height = mat->height + 1;
+    size_t temp_width = mat->width + 1;
+
+    uint8_t** temp = malloc(temp_height * sizeof(*temp));
+    for (size_t i = 0; i < temp_height; i++) {
+        temp[i] = malloc(temp_width * sizeof(temp[0]));
+    }
+
+
+}
