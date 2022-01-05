@@ -41,7 +41,6 @@ struct Masks create_masks() {
         write_to.masks[1].mask_radius = 1;
     }
 
-
     int** mask2 = malloc(3 * sizeof(*mask2));
     if (mask2) {
         for (size_t i = 0; i < 3; i++) {

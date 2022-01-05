@@ -108,6 +108,24 @@ struct ImageArray copy_image(struct ImageArray* image) {
     return output_image;
 }
 
+struct ImageMatrix copy_matrix(struct ImageMatrix* mat) {
+    uint8_t** output = malloc(mat->height * sizeof(*output));
+    for (size_t i = 0; i < mat->height; i++) {
+        output[i] = malloc(mat->width * sizeof(output[0]));
+    }
+
+    for (size_t i = 0; i < mat->height; ++i) {
+        for (size_t j = 0; j < mat->width; ++j) {
+            output[i][j] = mat->matrix[i][j];
+        }
+    }
+
+    struct ImageMatrix out;
+    out.matrix = output;
+    out.width = mat->width;
+    out.height = mat->height;
+    return out;
+}
 
 
 
@@ -178,7 +196,7 @@ uint8_t* matrix_to_image(struct ImageMatrix* mat) {
 
 
 // not working yet
-void copy_image_outward(struct ImageMatrix* mat) {
+struct ImageMatrix copy_image_outward(struct ImageMatrix* mat) {
     size_t temp_height = mat->height + 1;
     size_t temp_width = mat->width + 1;
 
@@ -187,5 +205,28 @@ void copy_image_outward(struct ImageMatrix* mat) {
         temp[i] = malloc(temp_width * sizeof(temp[0]));
     }
 
+    for (size_t i = 0; i < mat->width; ++i) { // gorny rzad
+        temp[0][i + 1] = mat->matrix[0][i];
+    }
+    for (size_t i = 0; i < mat->width; ++i) { //dolny rzad
+        temp[mat->height][i + 1] = mat->matrix[mat->height - 1][i];
+    }
 
+    for (size_t i = 0; i < mat->width; ++i) { // lewa strona
+        temp[i + 1][0] = mat->matrix[i][0];
+    }
+    for (size_t i = 0; i < mat->width; ++i) { // prawa strona
+        temp[i + 1][mat->width] = mat->matrix[i][mat->width - 1];
+    }
+
+    temp[0][0] = mat->matrix[0][0];                         // lewy gorny rog
+    temp[0][mat->width] = mat->matrix[0][mat->width - 1];   // prawy gorny rog
+    temp[mat->height][0] = mat->matrix[mat->height - 1][0]; // lewy dolny rog
+    temp[mat->height][mat->width] = mat->matrix[mat->height - 1][mat->width - 1]; // prawy dolny rog
+
+    struct ImageMatrix output;
+    output.matrix = temp;
+    output.height = temp_height;
+    output.width = temp_width;
+    return output;
 }

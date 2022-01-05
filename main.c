@@ -17,8 +17,6 @@
 
 
 
-
-
 uint8_t non_maximum_suppression(uint8_t** gradient_strength, uint8_t** edge_angle, size_t x, size_t y) {
     uint8_t value = gradient_strength[y][x];
     struct Neighbours n = get_neighbours(gradient_strength, x, y);
@@ -270,7 +268,7 @@ int main() {
     gaussian_blur(&image_mat);
 
     struct Masks mo = create_masks();
-    struct Mask mask = mo.masks[4];
+    struct Mask mask = mo.masks[1];
 
     calculate_gradient_strength(&image_mat, mask);
 
