@@ -144,6 +144,11 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="edge_detection_algorithms.h" />
+    <ClInclude Include="edge_detection_auxiliary.h" />
+    <ClInclude Include="edge_detection_masks.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

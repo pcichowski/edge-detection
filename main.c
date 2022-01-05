@@ -10,157 +10,14 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb-master/stb_image_write.h"
 
-size_t channels;
+#include "edge_detection_algorithms.h"
 
-struct ImageMatrix {
-    uint8_t** matrix;
-    size_t width;
-    size_t height;
-    size_t offset_x;
-    size_t offset_y;
-};
 
-struct ImageArray {
-    uint8_t* array;
-    size_t width;
-};
-
-struct Mask {
-    int** mask;
-    size_t mask_size;
-    size_t mask_radius;
-};
-
-struct Neighbours {
-    uint8_t up;
-    uint8_t down;
-    uint8_t right;
-    uint8_t left;
-
-    uint8_t upright;
-    uint8_t upleft;
-    uint8_t downright;
-    uint8_t downleft;
-};
-
-// converts 1xN image matrix to grayscale
-uint8_t* convert_to_grayscale(uint8_t* input, size_t width, size_t height) {
-    uint8_t* output = malloc(width * height * channels);
-
-    if (output) {
-        for (size_t i = 0; i < width * height * channels; i += channels) {
-
-            uint8_t pixel_value = 0;
-            // to convert to grayscale, each pixel's value is R/3 + G/3 + B/3
-            pixel_value = (uint8_t)((double)input[i] * 0.2126 + (double)input[i + 1] * 0.7152 + input[i + 2] * 0.0722);
-
-            output[i] = pixel_value;
-            output[i + 1] = pixel_value;
-            output[i + 2] = pixel_value;
-        }
-    }
-
-    return output;
-}
-
-// copies 1xN image matrix to another
-uint8_t* copy_image(uint8_t* input, size_t width, size_t height) {
-    uint8_t* output = malloc(width * height * channels);
-    
-    if (output) {
-        for (size_t i = 0; i < width * height * channels; ++i) {
-            output[i] = input[i];
-        }
-    }
-
-    return output;
-}
-
-// extracts chosen channel from 1xN image matrix
-uint8_t* get_channel(uint8_t* input, size_t width, size_t height, size_t channel_number) {
-
-    uint8_t* output = malloc(width * height);
-
-    if (output) {
-        for (size_t i = 0; i < width * height * channels; i += channels) {
-            output[i / channels] = input[i + channel_number];
-        }
-    }
-
-    return output;
-}
+#define LICZBA_MASEK 3
 
 
 
-// converts 1xN image matrix to NxN
-uint8_t** image_to_matrix(uint8_t* input, size_t width, size_t height) {
 
-    uint8_t** image = malloc(height * sizeof(*image));
-    for (size_t i = 0; i < height; i++) {
-        image[i] = malloc(width * sizeof(image[0]));
-    }
-
-    if (image) {
-        for (size_t i = 0; i < height; ++i) {
-            for (size_t j = 0; j < width; ++j) {
-                image[i][j] = input[j + i * width];
-            }
-        }
-    }
-
-    return image;
-}
-
-//converts NxN image matrix to 1xN
-uint8_t* matrix_to_image(uint8_t** input, size_t width, size_t height) {
-
-    uint8_t* output = malloc(width * height * sizeof(output[0]));
-
-    if (output) {
-        for (size_t i = 0; i < height; ++i) {
-            for (size_t j = 0; j < width; ++j) {
-                output[j + i * width] = input[i][j];
-            }
-        }
-    }
-
-    return output;
-}
-
-struct Neighbours get_neighbours(uint8_t** matrix, size_t x, size_t y) {
-    struct Neighbours n;
-
-    n.up = matrix[y - 1][x];
-    n.down = matrix[y + 1][x];
-    n.right = matrix[y][x + 1];
-    n.left = matrix[y][x - 1];
-    n.upright = matrix[y - 1][x + 1];
-    n.upleft = matrix[y - 1][x - 1];
-    n.downright = matrix[y + 1][x + 1];
-    n.downleft = matrix[y + 1][x - 1];
-
-    return n;
-}
-
-uint8_t calculate_mask(uint8_t** input, size_t x, size_t y, struct Mask mask) {
-    mask.mask_radius = (size_t)(mask.mask_size / 2);
-    size_t sum = 0;
-    for (size_t i = y - mask.mask_radius; i <= y + mask.mask_radius; ++i) {
-        for (size_t j = x - mask.mask_radius; j <= x + mask.mask_radius; ++j) {
-
-            int image_val = input[i][j];
-           
-            int mask_val = mask.mask[i - y + mask.mask_radius][j - x + mask.mask_radius];
-            //printf("%d %d\n", image_val, mask_val);
-
-            sum += image_val * mask_val;
-        }
-    }
-    //printf("%d\n\n", sum);
-    if (sum < 0) sum = 0;
-    if (sum > 255) sum = 255;
-    return (uint8_t)sum;
-}
 
 uint8_t non_maximum_suppression(uint8_t** gradient_strength, uint8_t** edge_angle, size_t x, size_t y) {
     uint8_t value = gradient_strength[y][x];
@@ -388,73 +245,97 @@ uint8_t** detect_edges_canny(uint8_t** input, size_t width, size_t height, struc
 }
 
 int main() {
+    
+    //struct Mask maska_1;
+    //struct Mask maska_2;
 
-    size_t width, height;
-    uint8_t* image = stbi_load("sample_park.jpg", &width, &height, &channels, 3);
+    
+    //struct Mask* maski = malloc(LICZBA_MASEK * sizeof(maski[0]));
+    //create_masks(&maski);
 
-    if (image) {
-        //printf("first %d pixels\n", 10);
-        //printf("width = %d, height = %d, num of channels = %d \n", width, height, channels);
-        for (size_t i = 0; i < 10 * channels; i++) {
-            //printf("%x%s", image[i], ((i + 1) % channels) ? " " : "\n");
+    
+
+    int width, height;
+    uint8_t* image = stbi_load("sample_lizard.jpg", &width, &height, &channels, 3);
+
+    uint8_t* gray = get_channel(convert_to_grayscale(image, width, height), width, height, 0);
+
+    struct ImageMatrix image_mat;
+    image_mat.width = width;
+    image_mat.height = height;
+    image_mat.matrix = image_to_matrix(gray, width, height);
+    /* end prologue*/
+    /* perform calculations on   image_mat */
+
+
+    int** mask1 = malloc(3 * sizeof(*mask1));
+    if (mask1) {
+        for (size_t i = 0; i < 3; i++) {
+            mask1[i] = malloc(3 * sizeof(mask1[0]));
+        }
+
+        mask1[0][0] = -1; mask1[0][1] = -2; mask1[0][2] = -1;
+        mask1[1][0] = 0;  mask1[1][1] = 0; mask1[1][2] = 0;
+        mask1[2][0] = 1; mask1[2][1] = 2; mask1[2][2] = 1;
+
+    }
+    struct Mask m;
+    m.mask = mask1;
+    m.mask_radius = 1;
+    m.mask_size = 3;
+
+    uint8_t** mask_gaussian = malloc(5 * sizeof(*mask_gaussian));
+    if (mask_gaussian) {
+        for (size_t i = 0; i < 5; i++) {
+            mask_gaussian[i] = malloc(5 * sizeof(mask_gaussian[0]));
+        }
+
+        mask_gaussian[0][0] = 2; mask_gaussian[0][1] = 4; mask_gaussian[0][2] = 5; mask_gaussian[0][3] = 4; mask_gaussian[0][4] = 2;
+        mask_gaussian[1][0] = 4; mask_gaussian[1][1] = 9; mask_gaussian[1][2] = 12; mask_gaussian[1][3] = 9; mask_gaussian[1][4] = 4;
+        mask_gaussian[2][0] = 5; mask_gaussian[2][1] = 12; mask_gaussian[2][2] = 15; mask_gaussian[2][3] = 12; mask_gaussian[2][4] = 5;
+        mask_gaussian[3][0] = 4; mask_gaussian[3][1] = 9; mask_gaussian[3][2] = 12; mask_gaussian[3][3] = 9; mask_gaussian[3][4] = 4;
+        mask_gaussian[4][0] = 2; mask_gaussian[4][1] = 4; mask_gaussian[4][2] = 5; mask_gaussian[4][3] = 4; mask_gaussian[4][4] = 2;
+        
+    }
+
+    for (size_t i = 0; i < 5; i++) {
+        for (size_t j = 0; j < 5; j++) {
+
+            printf("%d ", mask_gaussian[i][j]);
+
         }
         printf("\n");
     }
 
-    struct Mask maska_1;
-    struct Mask maska_2;
+    for (size_t i = 1; i < 4; i++) {
+        for (size_t j = 1; j < 4; j++) {
 
-    // maska
-    int** mask1 = malloc(3 * sizeof(*mask1));
-    for (size_t i = 0; i < 3; i++) {
-        mask1[i] = malloc(3 * sizeof(mask1[0]));
+            uint8_t pixel_value = calculate_mask(mask_gaussian, j, i, m);
+
+            mask_gaussian[i][j] = pixel_value;
+
+        }
     }
-    mask1[0][0] = -1; mask1[0][1] = -2; mask1[0][2] = -1;
-    mask1[1][0] = 0;  mask1[1][1] = 0; mask1[1][2] = 0;
-    mask1[2][0] = 1; mask1[2][1] = 2; mask1[2][2] = 1;
 
-    maska_1.mask = mask1;
-    maska_1.mask_size = 3;
 
-    int** mask2 = malloc(3 * sizeof(*mask2));
-    for (size_t i = 0; i < 3; i++) {
-        mask2[i] = malloc(3 * sizeof(mask2[0]));
+    printf("\n\n");
+
+    for (size_t i = 0; i < 5; i++) {
+        for (size_t j = 0; j < 5; j++) {
+
+            printf("%d ", mask_gaussian[i][j]);
+
+        }
+        printf("\n");
     }
-    mask2[0][0] = -1; mask2[0][1] = 0; mask2[0][2] = 1;
-    mask2[1][0] = -2;  mask2[1][1] = 0; mask2[1][2] = 2;
-    mask2[2][0] = -1; mask2[2][1] = 0; mask2[2][2] = 1;
-
-    maska_2.mask = mask2;
-    maska_2.mask_size = 3;
-
-    struct Mask maska_3;
-    int** mask3 = malloc(3 * sizeof(*mask3));
-    for (size_t i = 0; i < 3; i++) {
-        mask3[i] = malloc(3 * sizeof(mask3[0]));
-    }
-    mask3[0][0] = 0; mask3[0][1] = 1; mask3[0][2] = 2;
-    mask3[1][0] = -1;  mask3[1][1] = 0; mask3[1][2] = 1;
-    mask3[2][0] = -2; mask3[2][1] = -1; mask3[2][2] = 0;
-
-    maska_3.mask = mask3;
-    maska_3.mask_size = 3;
-
-    
-
-    uint8_t* gray = get_channel(convert_to_grayscale(image, width, height), width, height, 0); // get first channel of image in grayscale
 
 
-    //uint8_t** test = image_to_matrix(image, width, height);
 
-    //uint8_t** edges = detect_edges_canny(image_to_matrix(gray, width, height), width, height, maska_2, maska_1, 60, 180);
-    uint8_t** edges = detect_edges(image_to_matrix(gray, width, height), width, height, maska_3, 60, 180);
 
-    uint8_t* output = matrix_to_image(edges, width, height);
-
+    /* start epilogue */
+    uint8_t* output = matrix_to_image(&image_mat);
     stbi_write_jpg("output_test.jpg", width, height, 1, output, width * channels);
 
-
     stbi_image_free(image);
-
 	return 0;
 }
