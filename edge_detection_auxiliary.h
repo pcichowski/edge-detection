@@ -128,8 +128,6 @@ struct ImageMatrix copy_matrix(struct ImageMatrix* mat) {
 }
 
 
-
-
 // extracts chosen channel from 1xN image matrix
 uint8_t* get_channel(uint8_t* input, size_t width, size_t height, size_t channel_number) {
 
@@ -194,8 +192,14 @@ uint8_t* matrix_to_image(struct ImageMatrix* mat) {
 }
 
 
+int approximate_angle(double angle) {
+    if (((angle < 22.5) && (angle > -22.5)) || (angle > 157.5) || (angle < -157.5)) return 0;
+    else if (((angle > 22.5) && (angle < 67.5)) || (angle < -112.5) || (angle > -157.5)) return 45;
+    else if (((angle > 67.5) && (angle < 112.5)) || (angle < -67.5) || (angle > -112.5)) return 90;
+    else if (((angle > 112.5) && (angle < 157.5)) || (angle < -22.5) || (angle > -67.5)) return 135;
+}
 
-// not working yet
+
 struct ImageMatrix copy_image_outward(struct ImageMatrix* mat) {
     size_t temp_height = mat->height + 1;
     size_t temp_width = mat->width + 1;

@@ -3,6 +3,9 @@
 #include "edge_detection_auxiliary.h"
 #include "edge_detection_masks.h"
 
+long long mean;
+long long standard_deviation;
+
 uint8_t calculate_mask(uint8_t** input, size_t x, size_t y, struct Mask mask) {
     mask.mask_radius = (size_t)(mask.mask_size / 2);
     long long sum = 0;
@@ -157,11 +160,126 @@ void sobel_vertical(struct ImageMatrix* mat) {
     mat->matrix = gradient_strength;
 }
 
+void non_maximum_suppression(struct ImageMatrix* mat, int** edge_angle) {
+    for (size_t i = 1; i < mat->height - 1; i++) {
+        for (size_t j = 1; j < mat->width - 1; j++) {
+
+            uint8_t pixel_value = mat->matrix[i][j];
+
+            struct Neighbours n = get_neighbours(mat->matrix, j, i);
+
+            switch (edge_angle[i][j]) {
+            case 0:
+                if (pixel_value < n.right && pixel_value < n.left) {
+                    mat->matrix[i][j] = 0;
+                }
+                break;
+            case 45:
+                if (pixel_value >= n.upright && pixel_value >= n.downleft) {
+                    mat->matrix[i][j] = 0;
+                }
+                break;
+            case 90:
+                if (pixel_value >= n.up && pixel_value >= n.down) {
+                    mat->matrix[i][j] = 0;
+                }
+                break;
+            case 135:
+                if (pixel_value >= n.downright && pixel_value >= n.upleft) {
+                    mat->matrix[i][j] = 0;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    
+}
+
+void hysteresis(struct ImageMatrix* mat, int** edge_angle, uint8_t threshold_high, uint8_t threshold_low) {
+    for (size_t i = 1; i < mat->height - 1; ++i) {
+        for (size_t j = 1; j < mat->width - 1; ++j) {
+            uint8_t pixel_value = mat->matrix[i][j];
+
+            struct Neighbours n = get_neighbours(mat->matrix, j, i);
+
+            if (pixel_value > threshold_high) {
+                mat->matrix[i][j] = 255;
+            }
+            else if (pixel_value < threshold_low) {
+                mat->matrix[i][j] = 0;
+            }
+            else if (pixel_value < 0) {
+                mat->matrix[i][j] = 0;
+            }
+            else {
+                /*
+                switch (edge_angle[i][j]) {
+                case 0:
+                    if (n.up > threshold_high || n.down > threshold_high) mat->matrix[i][j] = 255;
+                    else mat->matrix[i][j] = 0;
+                    break;
+                case 45:
+                    if (n.upright > threshold_high || n.downleft > threshold_high) mat->matrix[i][j] = 255;
+                    else mat->matrix[i][j] = 0;
+                    break;
+                case 90:
+                    if (n.right > threshold_high || n.left > threshold_high) mat->matrix[i][j] = 255;
+                    else mat->matrix[i][j] = 0;
+                    break;
+                case 135:
+                    if (n.downright > threshold_high || n.upleft > threshold_high) mat->matrix[i][j] = 255;
+                    else mat->matrix[i][j] = 0;
+                    break;
+
+                default:
+                    break;
+                }*/
+                if (n.left >= threshold_high ||
+                    n.right >= threshold_high ||
+                    n.down >= threshold_high ||
+                    n.up >= threshold_high ||
+                    n.upleft >= threshold_high ||
+                    n.upright >= threshold_high ||
+                    n.downleft >= threshold_high ||
+                    n.downright >= threshold_high) {
+                    mat->matrix[i][j] = 255;
+                }
+                else {
+                    mat->matrix[i][j] = 0;
+                }
+
+            }
+            /*
+            if (n.left >= threshold_high ||
+                    n.right >= threshold_high ||
+                    n.down >= threshold_high ||
+                    n.up >= threshold_high ||
+                    n.upleft >= threshold_high ||
+                    n.upright >= threshold_high ||
+                    n.downleft >= threshold_high ||
+                    n.downright >= threshold_high) {
+                    mat->matrix[i][j] = 255;
+                }
+                else {
+                    mat->matrix[i][j] = 0;
+                }*/
+        }
+    }
+
+}
+
 void detect_edges(struct ImageMatrix* mat) {
 
     uint8_t** output = malloc(mat->height * sizeof(*output));
     for (size_t i = 0; i < mat->height; i++) {
         output[i] = malloc(mat->width * sizeof(output[0]));
+    }
+
+    int** edge_angle = malloc(mat->height * sizeof(*edge_angle));
+    for (size_t i = 0; i < mat->height; i++) {
+        edge_angle[i] = malloc(mat->width * sizeof(edge_angle[0]));
     }
 
     struct ImageMatrix gradient_vertical = copy_matrix(mat);
@@ -170,6 +288,50 @@ void detect_edges(struct ImageMatrix* mat) {
     sobel_vertical(&gradient_vertical);
     sobel_horizontal(&gradient_horizontal);
 
+    long long pixel_value_sum = 0;
+    long long variance = 0;
+
+    for (size_t i = 0; i < mat->height; ++i) {
+        for (size_t j = 0; j < mat->width; ++j) {
+            uint8_t gx_value = gradient_horizontal.matrix[i][j];
+            uint8_t gy_value = gradient_vertical.matrix[i][j];
+
+            double value = sqrt((double)gx_value * gx_value + (double)gy_value * gy_value);
+            if (value > 255) {
+                value = 255;
+            }
+
+            mat->matrix[i][j] = (uint8_t)value;
+
+            pixel_value_sum += (long long)value;
+
+            double angle_radians = atan2((double)(gy_value), (double)gx_value);
+            double angle_deg = angle_radians * 180.0 / 3.1415;
+
+            if (angle_deg < 0) {
+                angle_deg += 360;
+            }
+            if (angle_deg > 255) {
+                angle_deg = 255;
+            }
+
+            edge_angle[i][j] = approximate_angle(angle_deg);
+        }
+    }
+
+    mean = (long long)pixel_value_sum / (mat->width * mat->height);
+
+    for (size_t i = 0; i < mat->height; ++i) {
+        for (size_t j = 0; j < mat->width; ++j) {
+            long long difference = mat->matrix[i][j] - mean;
+            variance += difference * difference;
+        }
+    }
+    standard_deviation = (long long)sqrt(variance / (mat->width * mat->height));
+
+    non_maximum_suppression(mat, edge_angle);
+
+    hysteresis(mat, edge_angle, 130, 50);
     
 
 }
