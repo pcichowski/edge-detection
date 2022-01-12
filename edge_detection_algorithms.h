@@ -6,20 +6,23 @@
 long long mean;
 long long standard_deviation;
 
+/// <summary>
+/// function calculates 3x3 matrix mask with 3x3 bitmap matrix
+/// </summary>
+/// <param name="bitmap matrix"></param>
+/// <param name="x"></param>
+/// <param name="y"></param>
+/// <param name="mask"></param>
+/// <returns></returns>
 uint8_t calculate_mask(uint8_t** input, size_t x, size_t y, struct Mask mask) {
     mask.mask_radius = (size_t)(mask.mask_size / 2);
     long long sum = 0;
     
-    
-    //printf("%d %d image\n", x, y);
     for (size_t i = y - mask.mask_radius; i <= y + mask.mask_radius; ++i) {
         for (size_t j = x - mask.mask_radius; j <= x + mask.mask_radius; ++j) {
-            //printf("%d ", input[i][j]);
         }
-        //printf("\n");
     }
 
-    //printf("values\n");
     for (size_t i = y - mask.mask_radius; i <= y + mask.mask_radius; ++i) {
         for (size_t j = x - mask.mask_radius; j <= x + mask.mask_radius; ++j) {
 
@@ -29,22 +32,11 @@ uint8_t calculate_mask(uint8_t** input, size_t x, size_t y, struct Mask mask) {
 
             sum += (long long)image_val * mask_val;
 
-            //printf("%d ", (long long)image_val * mask_val);
         }
-        //printf("\n");
     }
-    //printf("suma %d\n", sum);
-    //printf("uint8 %d\n", (uint8_t) sum);
-
-    //printf("\n");
-
-    //sum /= 1200.0;
 
     if (sum < 0) sum = 0;
     if (sum > 255) sum = 255;
-    //printf("suma %d\n", sum);
-    //printf("uint8 %d\n", (uint8_t)sum);
-    //printf("\n");
 
     return (uint8_t)sum;
 }
@@ -71,6 +63,11 @@ uint8_t calculate_gaussian_mask(uint8_t** input, size_t x, size_t y, struct Mask
     return (uint8_t)sum;
 }
 
+/// <summary>
+/// performs convolution with given mask
+/// </summary>
+/// <param name="mat"></param>
+/// <param name="mask"></param>
 void calculate_gradient_strength(struct ImageMatrix* mat, struct Mask mask) {
     uint8_t** gradient_strength = malloc(mat->height * sizeof(*gradient_strength));
     for (size_t i = 0; i < mat->height; i++) {
@@ -90,6 +87,10 @@ void calculate_gradient_strength(struct ImageMatrix* mat, struct Mask mask) {
     mat->matrix = gradient_strength;
 }
 
+/// <summary>
+/// performs convolution with gaussian blur matrix 5x5
+/// </summary>
+/// <param name="mat"></param>
 void gaussian_blur(struct ImageMatrix* mat) {
     struct Masks mo = create_masks();
     struct Mask mask = mo.masks[0];
@@ -116,6 +117,10 @@ void gaussian_blur(struct ImageMatrix* mat) {
     }
 }
 
+/// <summary>
+/// performs convolution with horizontal sobel mask
+/// </summary>
+/// <param name="mat"></param>
 void sobel_horizontal(struct ImageMatrix* mat) {
     struct Masks mo = create_masks();
     struct Mask mask = mo.masks[2];
@@ -138,6 +143,10 @@ void sobel_horizontal(struct ImageMatrix* mat) {
     mat->matrix = gradient_strength;
 }
 
+/// <summary>
+/// performs convolution with vertical sobel mask
+/// </summary>
+/// <param name="mat"></param>
 void sobel_vertical(struct ImageMatrix* mat) {
     struct Masks mo = create_masks();
     struct Mask mask = mo.masks[1];
@@ -160,6 +169,11 @@ void sobel_vertical(struct ImageMatrix* mat) {
     mat->matrix = gradient_strength;
 }
 
+/// <summary>
+/// peforms non maximum suppresion on given bitmap matrix
+/// </summary>
+/// <param name="mat"></param>
+/// <param name="edge_angle"></param>
 void non_maximum_suppression(struct ImageMatrix* mat, int** edge_angle) {
     for (size_t i = 1; i < mat->height - 1; i++) {
         for (size_t j = 1; j < mat->width - 1; j++) {
@@ -214,28 +228,6 @@ void hysteresis(struct ImageMatrix* mat, int** edge_angle, uint8_t threshold_hig
                 mat->matrix[i][j] = 0;
             }
             else {
-                /*
-                switch (edge_angle[i][j]) {
-                case 0:
-                    if (n.up > threshold_high || n.down > threshold_high) mat->matrix[i][j] = 255;
-                    else mat->matrix[i][j] = 0;
-                    break;
-                case 45:
-                    if (n.upright > threshold_high || n.downleft > threshold_high) mat->matrix[i][j] = 255;
-                    else mat->matrix[i][j] = 0;
-                    break;
-                case 90:
-                    if (n.right > threshold_high || n.left > threshold_high) mat->matrix[i][j] = 255;
-                    else mat->matrix[i][j] = 0;
-                    break;
-                case 135:
-                    if (n.downright > threshold_high || n.upleft > threshold_high) mat->matrix[i][j] = 255;
-                    else mat->matrix[i][j] = 0;
-                    break;
-
-                default:
-                    break;
-                }*/
                 if (n.left >= threshold_high ||
                     n.right >= threshold_high ||
                     n.down >= threshold_high ||
@@ -251,25 +243,16 @@ void hysteresis(struct ImageMatrix* mat, int** edge_angle, uint8_t threshold_hig
                 }
 
             }
-            /*
-            if (n.left >= threshold_high ||
-                    n.right >= threshold_high ||
-                    n.down >= threshold_high ||
-                    n.up >= threshold_high ||
-                    n.upleft >= threshold_high ||
-                    n.upright >= threshold_high ||
-                    n.downleft >= threshold_high ||
-                    n.downright >= threshold_high) {
-                    mat->matrix[i][j] = 255;
-                }
-                else {
-                    mat->matrix[i][j] = 0;
-                }*/
         }
     }
 
 }
 
+
+/// <summary>
+/// combines all operations to detect edges using cany algorithm
+/// </summary>
+/// <param name="mat"></param>
 void detect_edges(struct ImageMatrix* mat) {
 
     uint8_t** output = malloc(mat->height * sizeof(*output));
@@ -331,7 +314,7 @@ void detect_edges(struct ImageMatrix* mat) {
 
     non_maximum_suppression(mat, edge_angle);
 
-    hysteresis(mat, edge_angle, 130, 50);
+    hysteresis(mat, edge_angle, 120, 50);
     
 
 }
