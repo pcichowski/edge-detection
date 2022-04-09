@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-  Edge detection on achromatic images written in pure C, based on Canny algorithm
+  Edge detection on achromatic images written in pure C, based on the algorithm created by John F. Canny
   <br><br>
 </h3>
 
