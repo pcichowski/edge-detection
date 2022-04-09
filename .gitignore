@@ -6,3 +6,8 @@
 /jpeg-6b
 /Debug
 /.vs
+/stb-master
+edge_detection_c.sln
+edge_detection_c.vcxproj
+edge_detection_c.vcxproj.filters
+edge_detection_c.vcxproj.users

@@ -15,18 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
+    <ClCompile Include="source\edge_detection_auxiliary.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="edge_detection_auxiliary.h">
+    <ClInclude Include="source\edge_detection_algorithms.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="edge_detection_algorithms.h">
+    <ClInclude Include="source\edge_detection_auxiliary.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="edge_detection_masks.h">
+    <ClInclude Include="source\edge_detection_masks.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

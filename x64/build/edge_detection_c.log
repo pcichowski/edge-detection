@@ -1,0 +1,11 @@
+﻿  edge_detection_auxiliary.c
+  main.c
+C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\source\edge_detection_algorithms.h(219,31): warning C4101: 'n': unreferenced local variable
+C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\source\edge_detection_algorithms.h(316,79): warning C4244: 'function': conversion from 'size_t' to 'double', possible loss of data
+C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\source\main.c(17,1): warning C4005: 'LICZBA_MASEK': macro redefinition
+C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\source\edge_detection_auxiliary.h(4): message : see previous definition of 'LICZBA_MASEK'
+C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\source\main.c(52,69): warning C4133: 'function': incompatible types - from 'size_t *' to 'int *'
+C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\source\main.c(71,74): warning C4267: 'function': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\source\edge_detection_auxiliary.h(200): warning C4715: 'approximate_angle': not all control paths return a value
+  edge_detection_c.vcxproj -> C:\Users\bl4ac\OneDrive\Pulpit\workspace\edge-detection\x64\build\edge_detection_c.exe

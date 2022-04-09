@@ -7,16 +7,31 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "edge_detection_c", "edge_de
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		build|Win32 = build|Win32
+		build|x64 = build|x64
+		build|x86 = build|x86
+		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.build|Win32.ActiveCfg = build|x64
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.build|Win32.Build.0 = build|x64
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.build|x64.ActiveCfg = build|x64
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.build|x64.Build.0 = build|x64
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.build|x86.ActiveCfg = build|Win32
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.build|x86.Build.0 = build|Win32
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Debug|Win32.Build.0 = Debug|Win32
 		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Debug|x64.ActiveCfg = Debug|x64
 		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Debug|x64.Build.0 = Debug|x64
 		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Debug|x86.ActiveCfg = Debug|Win32
 		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Debug|x86.Build.0 = Debug|Win32
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Release|Win32.ActiveCfg = Release|Win32
+		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Release|Win32.Build.0 = Release|Win32
 		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Release|x64.ActiveCfg = Release|x64
 		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Release|x64.Build.0 = Release|x64
 		{4A969D1D-56FA-4985-BFBF-A1BB317F9541}.Release|x86.ActiveCfg = Release|Win32
