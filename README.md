@@ -46,3 +46,12 @@ edge_detection_c.exe
 
 - #### Execute the program
 Images with detected edges are placed into the output folder with the same name and extension
+
+## Credits
+### License
+This project is a free and open-source software licensed under the **MIT license**
+
+### Acknowledgments:
+Used STB library developed by [nothings](https://github.com/nothings) for loading and saving to jpegs
+
+  - https://github.com/nothings/stb
