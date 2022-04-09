@@ -14,35 +14,13 @@
 #include "edge_detection_algorithms.h"
 
 
-#define LICZBA_MASEK 3
-
 void executeForAllImages();
 
 void detectEdges(const char*  inputPath, const char* outputPath);
 
 int main() {
     
-    /*
-    int width, height;
-    const char* inp = ".\\images\\input\\car.jpg";
-    uint8_t* image = stbi_load(inp, &width, &height, &channels, 3);
-
-    uint8_t* gray = get_channel(convert_to_grayscale(image, width, height), width, height, 0);
-
-    struct ImageMatrix image_mat;
-    image_mat.width = width;
-    image_mat.height = height;
-    image_mat.matrix = image_to_matrix(gray, width, height);
-
-    gaussian_blur(&image_mat);
-
-    detect_edges(&image_mat, 150, 50);
-
-    uint8_t* output = matrix_to_image(&image_mat);
-    stbi_write_jpg("./images/output/car.jpg", width, height, 1, output, width * channels);
-
-    stbi_image_free(image);
-    */
+    
     executeForAllImages();
 	return 0;
 }

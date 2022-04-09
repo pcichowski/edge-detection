@@ -1,7 +1,6 @@
 #pragma once
 
 size_t channels = 3;
-#define LICZBA_MASEK 4
 
 struct ImageMatrix {
     uint8_t** matrix;
