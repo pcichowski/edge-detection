@@ -3,9 +3,18 @@
 </h1>
 
 <h3 align="center">
-  Edge detection on achromatic images written in pure C, based on the algorithm created by John F. Canny
-  <br><br>
+  Edge detection on achromatic images written in pure C, <br>based on the algorithm created by John F. Canny
+  <br>
 </h3>
+
+## Algorithm
+The algorithm works by performing matrix convolutions in a few steps:
+1. Noise reduction - 5x5 Gaussian filter
+2. Finding intensity gradient - vertical and horizontal Sobel kernel
+3. Non-maximum suppression
+4. Hysteresis thresholding
+
+Thresholding is defined by two parameters - lower and upper threshold
 
 ## Examples
 ![architecture_resized](https://user-images.githubusercontent.com/81694867/162588031-8975bd22-8b93-4b67-8842-d880e8b5615f.png)
